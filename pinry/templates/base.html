@@ -36,7 +36,8 @@
             },
             pinFilter = "{{ request.resolver_match.kwargs.pin }}",
             tagFilter = "{{ request.resolver_match.kwargs.tag }}",
-            userFilter = "{{ request.resolver_match.kwargs.user }}";
+            userFilter = "{{ request.resolver_match.kwargs.user }}",
+            searchFilter = "{{ request.GET.search }}";
         </script>
         <!-- End JavaScript Variables -->
     </head>
@@ -66,7 +67,9 @@
                             <li><a href="{% url 'users:login' %}">Login</a></li>
                             <li><a href="{% url 'users:register' %}">Register</a></li>
                         {% endif %}
+                        <li class="form-inline"><div class="input-group"><input type="text" class="form-control" id="search-box" /><span class="input-group-btn"><button class="btn btn-default" id="search-button" type="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button></span></div></li>
                     </ul>
+                    <form id="search-form"><input type="hidden" name="search" /></form>
                 </div>
             </div>
         </div>

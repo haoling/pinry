@@ -127,8 +127,11 @@ class PinResource(ModelResource):
 
     def build_filters(self, filters=None):
         orm_filters = super(PinResource, self).build_filters(filters)
-        if filters and 'tag' in filters:
-            orm_filters['tags__name__in'] = filters['tag'].split(',')
+        if filters:
+            if 'tag' in filters:
+                orm_filters['tags__name__in'] = filters['tag'].split(',')
+            if 'search' in filters:
+                orm_filters['description__icontains'] = filters['search']
         return orm_filters
 
     def apply_filters(self, request, applicable_filters):
