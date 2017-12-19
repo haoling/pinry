@@ -61,7 +61,8 @@ $(window).load(function() {
         var modal = $('#pin-form'),
             formFields = [$('#pin-form-image-url'), $('#pin-form-description'),
             $('#pin-form-tags')],
-            pinFromUrl = getUrlParameter('pin-image-url');
+            pinFromUrl = getUrlParameter('pin-image-url'),
+            pinFromDomain = undefined;
         // If editable grab existing data
         if (editPinId) {
             var promise = getPinData(editPinId);
@@ -75,6 +76,8 @@ $(window).load(function() {
                 $('#pin-form-trash').show();
                 createPinPreviewFromForm();
             });
+        } else {
+            $('#pin-form-tags').val(tagFilter);
         }
         modal.modal('show');
         // Auto update preview on field changes
@@ -119,7 +122,15 @@ $(window).load(function() {
                 'margin-top': -35,
                 'margin-left': -281
             });
+            var urlParser = document.createElement('a');
+            urlParser.href = pinFromUrl;
+            pinFromDomain = urlParser.hostname;
+            $('#pin-form-tags').val($.cookie('pinform_domain_tag-' + pinFromDomain));
         }
+        if (getUrlParameter('pin-description')) {
+            $('#pin-form-description').val(getUrlParameter('pin-description'));
+        }
+
         // Submit pin on post click
         $('#pin-form-submit').click(function(e) {
             e.preventDefault();
@@ -163,7 +174,10 @@ $(window).load(function() {
                 else data.url = $('#pin-form-image-url').val();
                 var promise = postPinData(data);
                 promise.success(function(pin) {
-                    if (pinFromUrl) return window.close();
+                    if (pinFromUrl) {
+                        $.cookie('pinform_domain_tag-' + pinFromDomain, data.tags, {expires:30, path:'/'});
+                        return window.close();
+                    }
                     pin.editable = true;
                     pin = renderTemplate('#pins-template', {pins: [pin]});
                     $('#pins').prepend(pin);
