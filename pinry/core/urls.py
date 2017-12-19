@@ -20,7 +20,7 @@ urlpatterns = patterns('',
         name='pin-form'),
     url(r'^pins/create-image/$', CreateImage.as_view(), name='create-image'),
 
-    url(r'^pins/tag/(?P<tag>(\w|-)+)/$', TemplateView.as_view(template_name='core/pins.html'),
+    url(r'^pins/tag/(?P<tag>(\w|-)+)/(?:(?P<pin>[0-9]+)/)?$', TemplateView.as_view(template_name='core/pins.html'),
         name='tag-pins'),
     url(r'^pins/user/(?P<user>(\w|-)+)/$', TemplateView.as_view(template_name='core/pins.html'),
         name='user-pins'),
