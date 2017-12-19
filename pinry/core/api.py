@@ -131,16 +131,28 @@ class PinResource(ModelResource):
             if 'tag' in filters:
                 orm_filters['tags__name__in'] = filters['tag'].split(',')
             if 'search' in filters:
-                orm_filters['description__icontains'] = filters['search']
+                kws = filters['search'].split(' ')
+                if len(kws) == 1:
+                    orm_filters['description__icontains'] = filters['search']
+                else:
+                    q = Q(description__icontains=kws.pop(0))
+                    while (len(kws) > 0):
+                        q = q & Q(description__icontains=kws.pop(0))
+                    orm_filters.update({'description_search':q})
         return orm_filters
 
     def apply_filters(self, request, applicable_filters):
+        description_search = None
+        if 'description_search' in applicable_filters:
+            description_search = applicable_filters.pop('description_search')
         filtered = super(PinResource, self).apply_filters(request, applicable_filters)
         if applicable_filters.has_key('tags__name__in'):
             if 'private' not in (tag.lower() for tag in applicable_filters['tags__name__in']):
                 filtered = filtered.filter(Q(submitter=request.user.pk) | ~Q(tags__name__iexact='private'))
         else:
             filtered = filtered.exclude(tags__name__iexact='private')
+        if description_search:
+            filtered = filtered.filter(description_search)
         return filtered
 
     def save_m2m(self, bundle):
