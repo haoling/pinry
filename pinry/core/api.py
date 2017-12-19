@@ -6,6 +6,7 @@ from tastypie.exceptions import Unauthorized
 from tastypie.resources import ModelResource
 from django_images.models import Thumbnail
 
+from django.db.models import Q
 from .models import Pin, Image
 from ..users.models import User
 
@@ -145,6 +146,11 @@ class PinResource(ModelResource):
         if 'description_search' in applicable_filters:
             description_search = applicable_filters.pop('description_search')
         filtered = super(PinResource, self).apply_filters(request, applicable_filters)
+        if applicable_filters.has_key('tags__name__in'):
+            if 'private' not in (tag.lower() for tag in applicable_filters['tags__name__in']):
+                filtered = filtered.filter(Q(submitter=request.user.pk) | ~Q(tags__name__iexact='private'))
+        else:
+            filtered = filtered.exclude(tags__name__iexact='private')
         if description_search:
             filtered = filtered.filter(description_search)
         return filtered
