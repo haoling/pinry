@@ -71,6 +71,14 @@ a {
         margin-top: 15px;
         margin-bottom: 15px;
     }
+
+    .navbar-nav>li>.input-group {
+        margin-top: 15px;
+    }
+
+    .navbar-nav>li>.input-group .form-control, .navbar-nav>li>.input-group .btn {
+        height: 32px;
+    }
 }
 
 #bookmarklet {
