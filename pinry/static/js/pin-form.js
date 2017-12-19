@@ -72,6 +72,7 @@ $(window).load(function() {
                 $('#pin-form-image-upload').parent().hide();
                 $('#pin-form-description').val(editedPin.description);
                 $('#pin-form-tags').val(editedPin.tags);
+                $('#pin-form-trash').show();
                 createPinPreviewFromForm();
             });
         }
@@ -179,6 +180,20 @@ $(window).load(function() {
         $('#pin-form-close').click(function() {
             if (pinFromUrl) return window.close();
             dismissModal(modal);
+        });
+
+        // Delete pin if trash icon clicked
+        $('#pin-form-trash').click(function() {
+            $(this).off('click');
+            var promise = deletePinData(editedPin.id);
+            promise.success(function() {
+                $('#pins .pin[data-id='+editedPin.id+']').closest('.pin').remove();
+                tileLayout();
+                dismissModal(modal);
+            });
+            promise.error(function() {
+                message('Problem deleting image.', 'alert alert-danger');
+            });
         });
         createPinPreviewFromForm();
     }

@@ -58,23 +58,6 @@ $(window).load(function() {
             });
         });
 
-        // Delete pin if trash icon clicked
-        $('.glyphicon-trash').each(function() {
-            var thisPin = $(this);
-            $(this).off('click');
-            $(this).click(function() {
-                $(this).off('click');
-                var promise = deletePinData($(this).data('id'));
-                promise.success(function() {
-                    thisPin.closest('.pin').remove();
-                    tileLayout();
-                });
-                promise.error(function() {
-                    message('Problem deleting image.', 'alert alert-danger');
-                });
-            });
-        });
-
         // Show edit-buttons only on mouse over
         $('.pin').each(function(){
             var thisPin = $(this);
