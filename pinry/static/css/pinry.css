@@ -310,4 +310,8 @@ textarea {
     font-style: italic;
     text-align: center;
 }
+
+#pin-form .tag.btn {
+    margin-top: 4px;
+}
 /* End Pins */

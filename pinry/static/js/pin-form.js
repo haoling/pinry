@@ -57,7 +57,9 @@ $(window).load(function() {
 
     // Start View Functions
     function createPinForm(editPinId) {
-        $('body').append(renderTemplate('#pin-form-template', ''));
+        $('body').append(renderTemplate('#pin-form-template', {
+            recentTags: cleanTags($.cookie('pinform_recent_tag') || "")
+        }));
         var modal = $('#pin-form'),
             formFields = [$('#pin-form-image-url'), $('#pin-form-description'),
             $('#pin-form-tags')],
@@ -142,28 +144,39 @@ $(window).load(function() {
                     description: $('#pin-form-description').val(),
                     tags: cleanTags($('#pin-form-tags').val())
                 }
-                var promise = $.ajax({
-                    type: "put",
-                    url: apiUrl,
-                    contentType: 'application/json',
-                    data: JSON.stringify(data)
-                });
-                promise.success(function(pin) {
-                    pin.editable = true;
-                    var renderedPin = renderTemplate('#pins-template', {
-                        pins: [
-                            pin
-                        ]
-                    });
-                    $('#pins').find('.pin[data-id="'+pin.id+'"]').replaceWith(renderedPin);
+                if (editedPin.description == data.description && editedPin.tags.toString() == data.tags.toString()) {
                     tileLayout();
                     lightbox();
                     dismissModal(modal);
                     editedPin = null;
-                });
-                promise.error(function() {
-                    message('Problem updating image.', 'alert alert-danger');
-                });
+                } else {
+                    var promise = $.ajax({
+                        type: "put",
+                        url: apiUrl,
+                        contentType: 'application/json',
+                        data: JSON.stringify(data)
+                    });
+                    promise.success(function(pin) {
+                        pin.editable = true;
+                        var renderedPin = renderTemplate('#pins-template', {
+                            pins: [
+                                pin
+                            ]
+                        });
+                        var recentTags = cleanTags($.cookie('pinform_recent_tag') || "");
+                        data.tags.reverse().forEach(function(tag) { recentTags.unshift(tag); });
+                        recentTags = $.unique(recentTags).slice(0, 5);
+                        $.cookie('pinform_recent_tag', recentTags, {expires:185, path:'/'});
+                        $('#pins').find('.pin[data-id="'+pin.id+'"]').replaceWith(renderedPin);
+                        tileLayout();
+                        lightbox();
+                        dismissModal(modal);
+                        editedPin = null;
+                    });
+                    promise.error(function() {
+                        message('Problem updating image.', 'alert alert-danger');
+                    });
+                }
             } else {
                 var data = {
                     submitter: '/api/v1/user/'+currentUser.id+'/',
@@ -175,7 +188,9 @@ $(window).load(function() {
                 var promise = postPinData(data);
                 promise.success(function(pin) {
                     if (pinFromUrl) {
-                        $.cookie('pinform_domain_tag-' + pinFromDomain, data.tags, {expires:30, path:'/'});
+                        if (data.tags != '') {
+                            $.cookie('pinform_domain_tag-' + pinFromDomain, data.tags, {expires:30, path:'/'});
+                        }
                         return window.close();
                     }
                     pin.editable = true;
@@ -208,6 +223,9 @@ $(window).load(function() {
             promise.error(function() {
                 message('Problem deleting image.', 'alert alert-danger');
             });
+        });
+        $('#pin-form .tag.btn').click(function() {
+            $('#pin-form-tags').val($('#pin-form-tags').val() + ' ' + $(this).text());
         });
         createPinPreviewFromForm();
     }

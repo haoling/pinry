@@ -24,6 +24,9 @@
                             <div class="form-group">
                                 <label for="pin-form-tags">Tags</label>
                                 <input type="text" name="pin-form-tags" id="pin-form-tags" class="form-control"/>
+                                {{#each recentTags}}
+                                    <span class="tag btn btn-xs btn-primary">{{this}}</span>
+                                {{/each}}
                             </div>
                         </div>
                     </div>
