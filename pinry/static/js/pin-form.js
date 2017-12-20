@@ -146,7 +146,6 @@ $(window).load(function() {
                 }
                 if (editedPin.description == data.description && editedPin.tags.toString() == data.tags.toString()) {
                     tileLayout();
-                    lightbox();
                     dismissModal(modal);
                     editedPin = null;
                 } else {
@@ -208,6 +207,7 @@ $(window).load(function() {
         });
         $('#pin-form-close').click(function() {
             if (pinFromUrl) return window.close();
+            tileLayout();
             dismissModal(modal);
         });
 
