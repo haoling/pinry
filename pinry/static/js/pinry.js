@@ -97,6 +97,7 @@ $(window).load(function() {
         // Fetch our pins from the api using our current offset
         var apiUrl = '/api/v1/pin/?format=json&order_by=-id&offset='+String(offset);
         if (tagFilter) apiUrl = apiUrl + '&tag=' + tagFilter;
+        if (domainFilter) apiUrl = apiUrl + '&domain=' + domainFilter;
         if (userFilter) apiUrl = apiUrl + '&submitter__username=' + userFilter;
         if (searchFilter != '') apiUrl = apiUrl + '&search=' + searchFilter;
         $.get(apiUrl, function(pins) {

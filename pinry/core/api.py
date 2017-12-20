@@ -100,6 +100,7 @@ class PinResource(ModelResource):
     submitter = fields.ToOneField(UserResource, 'submitter', full=True)
     image = fields.ToOneField(ImageResource, 'image', full=True)
     tags = fields.ListField()
+    domain = fields.CharField(attribute='domain', readonly=True, null=True)
 
     def hydrate_image(self, bundle):
         url = bundle.data.get('url', None)
@@ -126,6 +127,9 @@ class PinResource(ModelResource):
         return map(str, bundle.obj.tags.all())
 
     def build_filters(self, filters=None):
+        if 'domain' in filters:
+            domain_filter = filters.pop('domain')
+
         orm_filters = super(PinResource, self).build_filters(filters)
 
         if filters:
@@ -152,6 +156,13 @@ class PinResource(ModelResource):
                 while (len(kws) > 0):
                     q = q & Q(description__icontains=kws.pop(0))
                 filtered = filtered.filter(q)
+
+        if request.GET.get('domain', None):
+            domain = request.GET.get('domain', None)
+            filtered = filtered.filter(
+                Q(url__startswith='http://'+domain+'/')
+                | Q(url__startswith='https://'+domain+'/')
+            )
 
         return filtered
 

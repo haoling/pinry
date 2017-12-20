@@ -5,6 +5,7 @@ try:
 except ImportError:  # Python 3 support
     from io import StringIO
 
+from urlparse import urlparse
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models, transaction
@@ -51,4 +52,12 @@ class Pin(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.submitter, self.published)
+
+    def get_domain(self):
+        if self.url:
+            u = urlparse(self.url)
+            return u.hostname
+        return None
+
+    domain = property(get_domain)
 
