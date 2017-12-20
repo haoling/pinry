@@ -81,7 +81,10 @@ $(window).load(function() {
         } else {
             $('#pin-form-tags').val(tagFilter);
         }
-        modal.modal('show');
+        modal.modal({
+            show: true,
+            backdrop: 'static'
+        });
         // Auto update preview on field changes
         var timer;
         for (var i in formFields) {
