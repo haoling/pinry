@@ -230,7 +230,18 @@ $(window).load(function() {
             });
         });
         $('#pin-form .tag.btn').click(function() {
-            $('#pin-form-tags').val($('#pin-form-tags').val() + ' ' + $(this).text());
+            $('#pin-form-tags').val($('#pin-form-tags').val() + ' ' + $(this).text()).trigger('change');
+        });
+        $('#pin-form-tags').change(function() {
+            var tags = cleanTags($('#pin-form-tags').val().trim());
+            $('#pin-form .tag.btn').removeClass('btn-success').addClass('btn-default');
+            $('#pin-form .tag.btn').each(function() {
+                if ($.inArray($(this).text(), tags) != -1) {
+                    $(this).removeClass('btn-default').addClass('btn-success');
+                }
+            });
+        }).keyup(function() {
+            $(this).trigger('change');
         });
         createPinPreviewFromForm();
     }
