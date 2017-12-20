@@ -142,7 +142,7 @@ $(window).load(function() {
                 var apiUrl = '/api/v1/pin/'+editedPin.id+'/?format=json';
                 var data = {
                     description: $('#pin-form-description').val(),
-                    tags: cleanTags($('#pin-form-tags').val())
+                    tags: cleanTags($('#pin-form-tags').val().trim())
                 }
                 if (editedPin.description == data.description && editedPin.tags.toString() == data.tags.toString()) {
                     tileLayout();
@@ -182,7 +182,7 @@ $(window).load(function() {
                 var data = {
                     submitter: '/api/v1/user/'+currentUser.id+'/',
                     description: $('#pin-form-description').val(),
-                    tags: cleanTags($('#pin-form-tags').val())
+                    tags: cleanTags($('#pin-form-tags').val().trim())
                 };
                 if (uploadedImage) data.image = '/api/v1/image/'+uploadedImage+'/';
                 else data.url = $('#pin-form-image-url').val();
