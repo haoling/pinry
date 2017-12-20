@@ -51,10 +51,10 @@ $(window).load(function() {
         // Edit pin if pencil icon clicked
         $('.glyphicon-pencil').each(function() {
             var thisPin = $(this);
-            $(this).off('click');
-            $(this).click(function() {
+            $(this).off('click').closest('div').off('click');
+            $(this).closest('div').click(function() {
                 $(this).off('click');
-                pinForm($(this).data('id'));
+                pinForm($('.glyphicon-pencil', this).data('id'));
             });
         });
 
