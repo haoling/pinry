@@ -164,7 +164,9 @@ $(window).load(function() {
                         });
                         var recentTags = cleanTags($.cookie('pinform_recent_tag') || "");
                         data.tags.reverse().forEach(function(tag) { recentTags.unshift(tag); });
-                        recentTags = $.unique(recentTags).slice(0, 5);
+                        recentTags = recentTags
+                            .filter(function(v, k, self) { return self.indexOf(v) === k && v != ''; })
+                            .slice(0, 5);
                         $.cookie('pinform_recent_tag', recentTags, {expires:185, path:'/'});
                         $('#pins').find('.pin[data-id="'+pin.id+'"]').replaceWith(renderedPin);
                         tileLayout();
