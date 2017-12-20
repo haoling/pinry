@@ -74,12 +74,12 @@ $(window).load(function() {
                 $('#pin-form-image-url').parent().hide();
                 $('#pin-form-image-upload').parent().hide();
                 $('#pin-form-description').val(editedPin.description);
-                $('#pin-form-tags').val(editedPin.tags);
+                $('#pin-form-tags').val(editedPin.tags).trigger('change');
                 $('#pin-form-trash').show();
                 createPinPreviewFromForm();
             });
         } else {
-            $('#pin-form-tags').val(tagFilter);
+            $('#pin-form-tags').val(tagFilter).trigger('change');
         }
         modal.modal({
             show: true,
@@ -130,7 +130,7 @@ $(window).load(function() {
             var urlParser = document.createElement('a');
             urlParser.href = pinFromUrl;
             pinFromDomain = urlParser.hostname;
-            $('#pin-form-tags').val($.cookie('pinform_domain_tag-' + pinFromDomain));
+            $('#pin-form-tags').val($.cookie('pinform_domain_tag-' + pinFromDomain)).trigger('change');
         }
         if (getUrlParameter('pin-description')) {
             $('#pin-form-description').val(getUrlParameter('pin-description'));
