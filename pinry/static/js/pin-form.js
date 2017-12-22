@@ -243,6 +243,9 @@ $(window).load(function() {
         }).keyup(function() {
             $(this).trigger('change');
         });
+        if ($('#pin-form-tags').val() != '') {
+            $('#pin-form-tags').trigger('change');
+        }
         createPinPreviewFromForm();
     }
     // End View Functions
