@@ -170,7 +170,8 @@ class PinResource(ModelResource):
                 if word == u'':
                     continue
                 if t == u'tag':
-                    r = Q(tags__name__icontains=word)
+                    ids = Pin.objects.all().filter(tags__name__icontains=word).values_list('id')
+                    r = Q(id__in=ids)
                     t = None
                 else:
                     if word.lower() == u'or':
