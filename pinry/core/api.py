@@ -182,6 +182,7 @@ class PinResource(ModelResource):
                     r = Q(description__icontains=word)
                 if n:
                     r = ~r
+                    n = False
                 if o == u'or':
                     q = q | r if q else r
                     o = u''
