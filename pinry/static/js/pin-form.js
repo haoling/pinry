@@ -183,8 +183,12 @@ $(window).load(function() {
                     description: $('#pin-form-description').val(),
                     tags: cleanTags($('#pin-form-tags').val().replace(',', ' ').trim())
                 };
-                if (uploadedImage) data.image = '/api/v1/image/'+uploadedImage+'/';
-                else data.url = $('#pin-form-image-url').val();
+                if (uploadedImage) {
+                    data.image = '/api/v1/image/'+uploadedImage+'/';
+                } else {
+                    data.url = $('#pin-form-image-url').val();
+                    data.referer = getUrlParameter('referer');
+                }
                 var promise = postPinData(data);
                 promise.success(function(pin) {
                     if (pinFromUrl) {

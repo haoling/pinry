@@ -18,10 +18,13 @@ from ..users.models import User
 
 class ImageManager(models.Manager):
     # FIXME: Move this into an asynchronous task
-    def create_for_url(self, url):
+    def create_for_url(self, url, referer):
         file_name = url.split("/")[-1].split('#')[0].split('?')[0]
         buf = StringIO()
-        response = requests.get(url)
+        if (referer):
+            response = requests.get(url, headers={'referer': referer})
+        else:
+            response = requests.get(url)
         buf.write(response.content)
         obj = InMemoryUploadedFile(buf, 'image', file_name,
                                    None, buf.tell(), None)
