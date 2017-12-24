@@ -148,14 +148,7 @@ class PinResource(ModelResource):
             filtered = filtered.exclude(tags__name__iexact='private')
 
         if request.GET.get('search', None):
-            kws = request.GET.get('search').split(' ')
-            if len(kws) == 1:
-                filtered = filtered.filter(description__icontains=kws[0])
-            else:
-                q = Q(description__icontains=kws.pop(0))
-                while (len(kws) > 0):
-                    q = q & Q(description__icontains=kws.pop(0))
-                filtered = filtered.filter(q)
+            filtered = filtered.filter(self.search_filter(request.GET.get('search')))
 
         if request.GET.get('domain', None):
             domain = request.GET.get('domain', None)
@@ -165,6 +158,46 @@ class PinResource(ModelResource):
             )
 
         return filtered
+
+    def search_filter(self, keywords):
+        q = None
+        t = None
+        n = False
+        o = None
+        word = u''
+        for c in keywords + u' ':
+            if c == u' ':
+                if word == u'':
+                    continue
+                if t == u'tag':
+                    r = Q(tags__name__icontains=word)
+                    t = None
+                else:
+                    if word.lower() == u'or':
+                        o = u'or'
+                        word = u''
+                        continue
+
+                    r = Q(description__icontains=word)
+                if n:
+                    r = ~r
+                if o == u'or':
+                    q = q | r if q else r
+                    o = u''
+                else:
+                    q = q & r if q else r
+                word = u''
+                continue
+            if c == u':' and word == u'tag':
+                t = u'tag'
+                word = u''
+                continue
+            if c == u':' and word == u'not':
+                n = True
+                word = u''
+                continue
+            word += c
+        return q
 
     def save_m2m(self, bundle):
         tags = bundle.data.get('tags', None)
