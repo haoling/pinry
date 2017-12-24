@@ -89,10 +89,12 @@ $(window).load(function() {
         if ($('.lightbox-wrapper').height()+140 > $(window).height())
             $('.lightbox-background').height($('.lightbox-wrapper').height()+160);
 
-        box.click(function() {
-            if (location.href.match(/\/([0-9]+)\/$/) && RegExp.$1 == context.id) {
-                history.replaceState(context.id, null, location.href);
+        box.click(function(e) {
+            if ($(e.target).is('a')) return true;
+            if (location.href.match(/\/([0-9]+)\/$/) && RegExp.$1 == pinFilter) {
+                history.replaceState(pinFilter, null, location.href);
                 history.pushState(null, null, location.href.replace(/\/[0-9]+\/$/, '/'));
+                pinFilter = undefined;
             }
             document.title = 'Pinry';
             $(this).fadeOut(200);
@@ -122,7 +124,7 @@ $(window).load(function() {
                 var promise = createPromise(id);
                 promise.success(function() {
                     history.pushState(id, null, location.href.replace(/\/$/, '') + '/' + id + '/');
-                    console.log(id);
+                    pinFilter = id;
                 });
                 promise.error(function() {
                     message('Problem problem fetching pin data.', 'alert alert-danger');
@@ -133,13 +135,16 @@ $(window).load(function() {
 
     window.onpopstate = function(e) {
         if (e.state) {
-            var promise = getPinData(e.state);
             var promise = createPromise(e.state);
+            promise.success(function() {
+                pinFilter = e.state;
+            });
             promise.error(function() {
                 message('Problem problem fetching pin data.', 'alert alert-danger');
             });
         } else {
             $('.lightbox-background').trigger('click');
+            pinFilter = undefined;
         }
     }
 
