@@ -44,6 +44,18 @@ $(window).load(function() {
 
 
     // Start View Functions
+    function createPromise(id) {
+        var promise = getPinData(id);
+        promise.success(function(pin) {
+            var title = pin.description;
+            if (title.length > 20) {
+                title = title.substr(0, 20) + '...';
+            }
+            document.title = 'Pinry - ' + title;
+            createBox(pin);
+        });
+        return promise;
+    }
     function createBox(context) {
         freezeScroll();
         $('body').append(renderTemplate('#lightbox-template', context));
@@ -78,6 +90,11 @@ $(window).load(function() {
             $('.lightbox-background').height($('.lightbox-wrapper').height()+160);
 
         box.click(function() {
+            if (location.href.match(/\/([0-9]+)\/$/) && RegExp.$1 == context.id) {
+                history.replaceState(context.id, null, location.href);
+                history.pushState(null, null, location.href.replace(/\/[0-9]+\/$/, '/'));
+            }
+            document.title = 'Pinry';
             $(this).fadeOut(200);
             setTimeout(function() {
                 box.remove();
@@ -92,10 +109,7 @@ $(window).load(function() {
     window.lightbox = function() {
         var links = $('body').find('.lightbox');
         if (pinFilter) {
-            var promise = getPinData(pinFilter);
-            promise.success(function(pin) {
-                createBox(pin);
-            });
+            var promise = createPromise(pinFilter);
             promise.error(function() {
                 message('Problem problem fetching pin data.', 'alert alert-danger');
             });
@@ -104,15 +118,29 @@ $(window).load(function() {
             $(this).off('click');
             $(this).click(function(e) {
                 e.preventDefault();
-                var promise = getPinData($(this).data('id'));
-                promise.success(function(pin) {
-                    createBox(pin);
+                var id = $(this).data('id');
+                var promise = createPromise(id);
+                promise.success(function() {
+                    history.pushState(id, null, location.href.replace(/\/$/, '') + '/' + id + '/');
+                    console.log(id);
                 });
                 promise.error(function() {
                     message('Problem problem fetching pin data.', 'alert alert-danger');
                 });
             });
         });
+    }
+
+    window.onpopstate = function(e) {
+        if (e.state) {
+            var promise = getPinData(e.state);
+            var promise = createPromise(e.state);
+            promise.error(function() {
+                message('Problem problem fetching pin data.', 'alert alert-danger');
+            });
+        } else {
+            $('.lightbox-background').trigger('click');
+        }
     }
 
     // End Global Init Function
