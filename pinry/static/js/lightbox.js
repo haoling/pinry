@@ -11,37 +11,40 @@
  */
 
 
-$(window).load(function() {
-    // Start Helper Functions
-    function freezeScroll(freeze) {
-        freeze = typeof freeze !== 'undefined' ? freeze : true;
-        if (freeze) {
+// Start Helper Functions
+function freezeScroll(freeze) {
+    freeze = typeof freeze !== 'undefined' ? freeze : true;
+    if (freeze) {
+        if ($('body').data('scroll-level') == undefined) {
             $('body').data('scroll-level', $(window).scrollTop());
-            $('#pins').css({
-                'position': 'fixed',
-                'margin-top': -$('body').data('scroll-level')
-            });
-            $(window).scrollTop(0);
-            /* disable the global pin-loading scroll handler so we don't
-               load pins when scrolling a selected image */
-            $(window).off('scroll');
-        } else {
-            $('#pins').css({
-                'position': 'static',
-                'margin-top': 0
-            });
-            $(window).scrollTop($('body').data('scroll-level'));
-            /* enable the pin-loading scroll handler unless we've already
-               loaded all pins from the server (in which case an element
-               with id 'the-end' exists */
-            var theEnd = document.getElementById('the-end');
-            if (!theEnd) {
-                $(window).scroll(scrollHandler);
-            }
+        }
+        $('#pins').css({
+            'position': 'fixed',
+            'margin-top': -$('body').data('scroll-level')
+        });
+        $(window).scrollTop(0);
+        /* disable the global pin-loading scroll handler so we don't
+           load pins when scrolling a selected image */
+        $(window).off('scroll');
+    } else {
+        $('#pins').css({
+            'position': 'static',
+            'margin-top': 0
+        });
+        $(window).scrollTop($('body').data('scroll-level'));
+        $('body').removeData('scroll-level');
+        /* enable the pin-loading scroll handler unless we've already
+           loaded all pins from the server (in which case an element
+           with id 'the-end' exists */
+        var theEnd = document.getElementById('the-end');
+        if (!theEnd) {
+            $(window).scroll(scrollHandler);
         }
     }
-    // End Helper Functions
+}
+// End Helper Functions
 
+$(window).load(function() {
 
     // Start View Functions
     function createPromise(id) {
@@ -57,17 +60,37 @@ $(window).load(function() {
         return promise;
     }
     function createBox(context) {
-        freezeScroll();
-        $('body').append(renderTemplate('#lightbox-template', context));
         var box = $('.lightbox-background');
-        box.css('height', $(document).height());
+        var load = true;
+        if (box.attr('data-id') != context.id) {
+            var oldBox = box;
+            oldBox.fadeOut(200);
+            setTimeout(function() {
+                oldBox.remove();
+            }, 200);
+
+            freezeScroll();
+            $('body').append(renderTemplate('#lightbox-template', context));
+            box = $('.lightbox-background');
+        } else {
+            // redraw
+            load = false;
+            freezeScroll();
+        }
+
+        box.css('height', '100%');
         if (window.matchMedia('(min-width:'+context.image.standard.width+'px)').matches) {
             $('.lightbox-image-wrapper').css('height', context.image.standard.height);
         }
-        box.fadeIn(200);
-        $('.lightbox-image').load(function() {
-            $(this).fadeIn(200);
-        });
+
+
+        if (load) {
+            box.fadeIn(200);
+            $('.lightbox-image').load(function() {
+                $(this).fadeIn(200);
+            });
+        }
+
         if (window.matchMedia('(min-width:'+context.image.standard.width+'px)').matches) {
             $('.lightbox-wrapper').css({
                 'width': context.image.standard.width,
@@ -86,13 +109,19 @@ $(window).load(function() {
                 'width': '100%'
             });
         }
-        if ($('.lightbox-wrapper').height()+140 > $(window).height())
-            $('.lightbox-background').height($('.lightbox-wrapper').height()+160);
+        if ($('.lightbox-wrapper').height()+140 > $(window).height()) {
+            $('.lightbox-wrapper').css({
+                'margin-top': 10,
+                'margin-bottom': 10,
+            });
+            if ($('.lightbox-wrapper').height() > $(window).height()) {
+                $('.lightbox-background').height($('.lightbox-wrapper').height()+20);
+            }
+        }
 
         box.click(function(e) {
             if ($(e.target).is('a')) return true;
             if (location.href.match(/\/([0-9]+)\/$/) && RegExp.$1 == pinFilter) {
-                history.replaceState(pinFilter, null, location.href);
                 history.pushState(null, null, location.href.replace(/\/[0-9]+\/$/, '/'));
                 pinFilter = undefined;
             }
@@ -123,7 +152,7 @@ $(window).load(function() {
                 var id = $(this).data('id');
                 var promise = createPromise(id);
                 promise.success(function() {
-                    history.pushState(id, null, location.href.replace(/\/$/, '') + '/' + id + '/');
+                    history.pushState({ pin:id }, null, location.href.replace(/\/$/, '') + '/' + id + '/');
                     pinFilter = id;
                 });
                 promise.error(function() {
@@ -134,10 +163,10 @@ $(window).load(function() {
     }
 
     window.onpopstate = function(e) {
-        if (e.state) {
-            var promise = createPromise(e.state);
+        if (e.state && e.state.pin) {
+            var promise = createPromise(e.state.pin);
             promise.success(function() {
-                pinFilter = e.state;
+                pinFilter = e.state.pin;
             });
             promise.error(function() {
                 message('Problem problem fetching pin data.', 'alert alert-danger');

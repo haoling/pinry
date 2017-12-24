@@ -13,15 +13,19 @@ $(window).load(function() {
      * was put into a function in order to adjust frequently on screen size 
      * changes.
      */
-    window.tileLayout = function() {
-        var blockContainer = $('#pins'),
-            blocks = blockContainer.children('.pin'),
+    window.tileLayout = function(autoScroll) {
+        var blockContainer = $('#pins');
+        var isFreezed = blockContainer.css('position') == 'fixed';
+        freezeScroll(false);
+        var blocks = blockContainer.children('.pin'),
             blockMargin = 15,
             blockWidth = 240,
             rowSize = Math.floor(blockContainer.width()/(blockWidth+blockMargin)),
             colHeights = [],
             rowMargins = [],
-            marginLeft = 0;
+            marginLeft = 0,
+            oldHeight = blockContainer.height(),
+            oldScrollPos = $(window).scrollTop();
 
         // Fill our colHeights array with 0 for each row we have
         for (var i=0; i < rowSize; i++) colHeights[i] = 0;
@@ -72,6 +76,10 @@ $(window).load(function() {
 
         $('.spinner').css('display', 'none');
         blockContainer.css('height', colHeights.sort().slice(-1)[0]);
+
+        if (autoScroll) {
+            $(window).scrollTop((blockContainer.height() / oldHeight) * oldScrollPos);
+        }
     }
 
     /**
@@ -150,7 +158,7 @@ $(window).load(function() {
 
     // If our window gets resized keep the tiles looking clean and in our window
     $(window).resize(function() {
-        tileLayout();
+        tileLayout(true);
         lightbox();
     });
 
