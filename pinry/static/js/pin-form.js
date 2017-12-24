@@ -230,7 +230,13 @@ $(window).load(function() {
             });
         });
         $('#pin-form .tag.btn').click(function() {
-            $('#pin-form-tags').val($('#pin-form-tags').val() + ' ' + $(this).text()).trigger('change');
+            var tags = cleanTags($('#pin-form-tags').val().replace(',', ' ').trim());
+            if (tags.indexOf($(this).text()) != -1) {
+                tags.splice(tags.indexOf($(this).text()), 1);
+            } else {
+                tags.push($(this).text());
+            }
+            $('#pin-form-tags').val(tags.join(' ')).trigger('change');
         });
         $('#pin-form-tags').change(function() {
             var tags = cleanTags($('#pin-form-tags').val().trim());
