@@ -121,8 +121,11 @@ $(window).load(function() {
 
         box.click(function(e) {
             if ($(e.target).is('a')) return true;
-            if (location.href.match(/\/([0-9]+)\/$/) && RegExp.$1 == pinFilter) {
-                history.pushState(null, null, location.href.replace(/\/[0-9]+\/$/, '/'));
+            if (location.pathname.match(/\/([0-9]+)\/$/) && RegExp.$1 == pinFilter) {
+                var url = location.origin
+                  + location.pathname.replace(/\/[0-9]+\/$/, '/')
+                  + location.search;
+                history.pushState(null, null, url);
                 pinFilter = undefined;
             }
             document.title = 'Pinry';
@@ -152,7 +155,10 @@ $(window).load(function() {
                 var id = $(this).data('id');
                 var promise = createPromise(id);
                 promise.success(function() {
-                    history.pushState({ pin:id }, null, location.href.replace(/\/$/, '') + '/' + id + '/');
+                    var url = location.origin
+                      + location.pathname.replace(/\/$/, '') + '/' + id + '/'
+                      + location.search;
+                    history.pushState({ pin:id }, null, url);
                     pinFilter = id;
                 });
                 promise.error(function() {
