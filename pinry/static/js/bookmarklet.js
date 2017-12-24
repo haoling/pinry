@@ -100,7 +100,11 @@
             border: '1px solid #555'
         });
         image.onclick = function() {
-            var popUrl = getFormUrl({'pin-image-url':imageUrl, 'pin-description':document.title+"\n"+location.href});
+            var popUrl = getFormUrl({
+                'pin-image-url':imageUrl,
+                'pin-description':document.title+"\n"+location.href,
+                'referer':location.href
+            });
             window.open(popUrl);
             closePinry();
         };
