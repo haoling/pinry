@@ -123,10 +123,6 @@ $(window).load(function() {
             $('#pin-form-image-upload').parent().css('display', 'none');
             $('#pin-form-image-url').val(pinFromUrl);
             $('.navbar').css('display', 'none');
-            modal.css({
-                'margin-top': -35,
-                'margin-left': -281
-            });
             var urlParser = document.createElement('a');
             urlParser.href = pinFromUrl;
             pinFromDomain = urlParser.hostname;
