@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from tastypie.api import Api
 
 from .api import ImageResource, ThumbnailResource, PinResource, UserResource
-from .views import CreateImage
+from .views import CreateImage, FullImage
 
 
 v1_api = Api(api_name='v1')
@@ -30,6 +30,7 @@ urlpatterns = patterns('',
         name='domain-pins'),
     url(r'^(?P<pin>[0-9]+)/$', TemplateView.as_view(template_name='core/pins.html'),
         name='recent-pins'),
+    url(r'^i/(?P<pin>[0-9]+)\.(jpg|png|gif)$', FullImage.as_view(), name='full-image'),
     url(r'^$', TemplateView.as_view(template_name='core/pins.html'),
         name='recent-pins'),
 )

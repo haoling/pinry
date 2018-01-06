@@ -28,7 +28,7 @@
                         {{/if}}
                     </div>
                     <div class="text extra pull-right">
-                        <a href="{{image.image}}" class="btn btn-sm btn_default btn-info" target="_blank">Full Size</a>
+                        <a href="{{#if image.extension}}/i/{{id}}.{{image.extension}}{{else}}{{image.image}}{{/if}}" class="btn btn-sm btn_default btn-info" target="_blank">Full Size</a>
                         <a href="{{url}}" class="btn btn-sm btn-default btn-warning">Original URL</a>
                         <a href="{% endverbatim %}{% if request.resolver_match.kwargs.tag %}/pins/tag/{{ request.resolver_match.kwargs.tag }}{% endif %}{% verbatim %}/{{id}}/" class="btn btn-sm btn-default btn-success">Pin URL</a>
                     </div>

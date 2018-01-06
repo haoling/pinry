@@ -87,6 +87,7 @@ class ImageResource(ModelResource):
                                   attribute=lambda bundle: filter_generator_for('thumbnail')(bundle))
     square = fields.ToOneField(ThumbnailResource, full=True,
                                attribute=lambda bundle: filter_generator_for('square')(bundle))
+    extension = fields.CharField(attribute='extension', readonly=True)
 
     class Meta:
         fields = ['image', 'width', 'height']

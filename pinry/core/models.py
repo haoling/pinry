@@ -1,4 +1,5 @@
 import requests
+import os
 
 try:
     from cStringIO import StringIO
@@ -42,6 +43,11 @@ class Image(BaseImage):
 
     class Meta:
         proxy = True
+
+    def get_extension(self):
+        return os.path.splitext(self.image.name)[1][1:]
+
+    extension = property(get_extension)
 
 
 class Pin(models.Model):
