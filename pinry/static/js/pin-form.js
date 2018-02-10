@@ -165,7 +165,7 @@ $(window).load(function() {
                         data.tags.reverse().forEach(function(tag) { recentTags.unshift(tag); });
                         recentTags = recentTags
                             .filter(function(v, k, self) { return self.indexOf(v) === k && v != ''; })
-                            .slice(0, 5);
+                            .slice(0, 10);
                         $.cookie('pinform_recent_tag', recentTags, {expires:185, path:'/'});
                         $('#pins').find('.pin[data-id="'+pin.id+'"]').replaceWith(renderedPin);
                         tileLayout();
@@ -194,6 +194,8 @@ $(window).load(function() {
                     if (pinFromUrl) {
                         if (data.tags != '') {
                             $.cookie('pinform_domain_tag-' + pinFromDomain, data.tags, {expires:30, path:'/'});
+                        } else if ($.cookie('pinform_domain_tag-' + pinFromDomain) != '') {
+                            $.removeCookie('pinform_domain_tag-' + pinFromDomain, {path:'/'});
                         }
                         return window.close();
                     }
