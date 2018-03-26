@@ -58,8 +58,12 @@ $(window).load(function() {
 
     // Start View Functions
     function createPinForm(editPinId) {
+        if ($.cookie('pinform_recent_tag')) {
+            localStorage.setItem('pinform_recent_tag', $.cookie('pinform_recent_tag'));
+            $.cookie('pinform_recent_tag', '', {expire:1, path:'/'});
+        }
         $('body').append(renderTemplate('#pin-form-template', {
-            recentTags: cleanTags($.cookie('pinform_recent_tag') || "")
+            recentTags: cleanTags(localStorage.getItem('pinform_recent_tag') || "")
         }));
         var modal = $('#pin-form'),
             formFields = [$('#pin-form-image-url'), $('#pin-form-description'),
@@ -127,7 +131,11 @@ $(window).load(function() {
             var urlParser = document.createElement('a');
             urlParser.href = pinFromUrl;
             pinFromDomain = urlParser.hostname;
-            $('#pin-form-tags').val($.cookie('pinform_domain_tag-' + pinFromDomain)).trigger('change');
+            if ($.cookie('pinform_domain_tag-' + pinFromDomain)) {
+                localStorage.setItem('pinform_domain_tag-' + pinFromDomain);
+                $.cookie('pinform_domain_tag-' + pinFromDomain, '', {expire:1, path:'/'});
+            }
+            $('#pin-form-tags').val(localStorage.getItem('pinform_domain_tag-' + pinFromDomain)).trigger('change');
         }
         if (getUrlParameter('pin-description')) {
             $('#pin-form-description').val(getUrlParameter('pin-description'));
@@ -162,12 +170,16 @@ $(window).load(function() {
                                 pin
                             ]
                         });
-                        var recentTags = cleanTags($.cookie('pinform_recent_tag') || "");
+                        if ($.cookie('pinform_recent_tag')) {
+                            localStorage.setItem('pinform_recent_tag', $.cookie('pinform_recent_tag'));
+                            $.cookie('pinform_recent_tag', '', {expire:1, path:'/'});
+                        }
+                        var recentTags = cleanTags(localStorage.getItem('pinform_recent_tag') || "")
                         data.tags.reverse().forEach(function(tag) { recentTags.unshift(tag); });
                         recentTags = recentTags
                             .filter(function(v, k, self) { return self.indexOf(v) === k && v != ''; })
                             .slice(0, RECENT_TAGS_LIMIT);
-                        $.cookie('pinform_recent_tag', recentTags, {expires:185, path:'/'});
+                        localStorage.setItem('pinform_recent_tag', recentTags);
                         $('#pins').find('.pin[data-id="'+pin.id+'"]').replaceWith(renderedPin);
                         tileLayout();
                         lightbox();
@@ -194,16 +206,16 @@ $(window).load(function() {
                 promise.success(function(pin) {
                     if (pinFromUrl) {
                         if (data.tags != '') {
-                            $.cookie('pinform_domain_tag-' + pinFromDomain, data.tags, {expires:30, path:'/'});
-                        } else if ($.cookie('pinform_domain_tag-' + pinFromDomain) != '') {
-                            $.removeCookie('pinform_domain_tag-' + pinFromDomain, {path:'/'});
+                            localStorage.setItem('pinform_domain_tag-' + pinFromDomain, data.tags);
+                        } else if (localStorage.getItem('pinform_domain_tag-' + pinFromDomain) != '') {
+                            localStorage.removeItem('pinform_domain_tag-' + pinFromDomain, {path:'/'});
                         }
-                        var recentTags = cleanTags($.cookie('pinform_recent_tag') || "");
+                        var recentTags = cleanTags(localStorage.getItem('pinform_recent_tag') || "");
                         data.tags.reverse().forEach(function(tag) { recentTags.unshift(tag); });
                         recentTags = recentTags
                             .filter(function(v, k, self) { return self.indexOf(v) === k && v != ''; })
                             .slice(0, RECENT_TAGS_LIMIT);
-                        $.cookie('pinform_recent_tag', recentTags, {expires:185, path:'/'});
+                        localStorage.setItem('pinform_recent_tag', recentTags);
                         return window.close();
                     }
                     pin.editable = true;
