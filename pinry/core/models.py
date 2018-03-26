@@ -24,6 +24,9 @@ class ImageManager(models.Manager):
         buf = StringIO()
         if (referer):
             response = requests.get(url, headers={'referer': referer})
+            if (response.status_code == 403):
+                print "status_code: %s, retry without referer" % (response.status_code)
+                response = requests.get(url)
         else:
             response = requests.get(url)
         buf.write(response.content)
