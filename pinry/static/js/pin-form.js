@@ -129,7 +129,11 @@ $(window).load(function() {
             $('#pin-form-image-url').val(pinFromUrl);
             $('.navbar').css('display', 'none');
             var urlParser = document.createElement('a');
-            urlParser.href = pinFromUrl;
+            if (getUrlParameter('referer') != '') {
+                urlParser.href = getUrlParameter('referer');
+            } else {
+                urlParser.href = pinFromUrl;
+            }
             pinFromDomain = urlParser.hostname;
             if ($.cookie('pinform_domain_tag-' + pinFromDomain)) {
                 localStorage.setItem('pinform_domain_tag-' + pinFromDomain);
