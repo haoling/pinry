@@ -3,7 +3,7 @@
     position: absolute;
     right: 10px;
     top: 60px;
-    z-index: 200;
+    z-index: 2000;
 }
 
 #messages li {

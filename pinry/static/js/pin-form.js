@@ -114,7 +114,7 @@ $(window).load(function() {
                     createPinPreviewFromForm();
                 });
                 promise.error(function() {
-                    message('Problem uploading image.', 'alert alert-error');
+                    message('Problem uploading image.', 'alert alert-error', -1);
                 });
             }
         });
@@ -174,7 +174,7 @@ $(window).load(function() {
                         editedPin = null;
                     });
                     promise.error(function() {
-                        message('Problem updating image.', 'alert alert-danger');
+                        message('Problem updating image.', 'alert alert-danger', -1);
                     });
                 }
             } else {
@@ -208,7 +208,7 @@ $(window).load(function() {
                     uploadedImage = false;
                 });
                 promise.error(function() {
-                    message('Problem saving image.', 'alert alert-danger');
+                    message('Problem saving image.', 'alert alert-danger', -1);
                 });
             }
         });
