@@ -11,6 +11,7 @@
 $(window).load(function() {
     var uploadedImage = false;
     var editedPin = null;
+    var RECENT_TAGS_LIMIT = 10;
 
     // Start Helper Functions
     function getFormData() {
@@ -165,7 +166,7 @@ $(window).load(function() {
                         data.tags.reverse().forEach(function(tag) { recentTags.unshift(tag); });
                         recentTags = recentTags
                             .filter(function(v, k, self) { return self.indexOf(v) === k && v != ''; })
-                            .slice(0, 10);
+                            .slice(0, RECENT_TAGS_LIMIT);
                         $.cookie('pinform_recent_tag', recentTags, {expires:185, path:'/'});
                         $('#pins').find('.pin[data-id="'+pin.id+'"]').replaceWith(renderedPin);
                         tileLayout();
@@ -197,6 +198,12 @@ $(window).load(function() {
                         } else if ($.cookie('pinform_domain_tag-' + pinFromDomain) != '') {
                             $.removeCookie('pinform_domain_tag-' + pinFromDomain, {path:'/'});
                         }
+                        var recentTags = cleanTags($.cookie('pinform_recent_tag') || "");
+                        data.tags.reverse().forEach(function(tag) { recentTags.unshift(tag); });
+                        recentTags = recentTags
+                            .filter(function(v, k, self) { return self.indexOf(v) === k && v != ''; })
+                            .slice(0, RECENT_TAGS_LIMIT);
+                        $.cookie('pinform_recent_tag', recentTags, {expires:185, path:'/'});
                         return window.close();
                     }
                     pin.editable = true;
