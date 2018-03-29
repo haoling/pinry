@@ -1,5 +1,3 @@
-**Pinry 2.0 is underway! If you'd like to help with the development process check out our current progress on the 2.x branch. If you'd like to use Pinry 2.0 please don't, it's terrible right now. Keep using the 1.x/master branches.**
-
 |Pinry|
 =======
 
@@ -16,16 +14,9 @@ Requirements
 Pinry is built on top of Django and optimized to run on a Linux
 environment. However we have gotten Pinry to work on Windows and Mac as
 well but it may require some extra digging around configuration. Pinry's
-Python requirements are all in the ``requirements.txt`` file and easily
-installable once you have up a virtual environment. What you need
-initially:
-
-* Python
-* pip
-* virtualenv
-* Your OS's build tools (Ubuntu: ``build-essential``, Mac: ``Xcode``)
-* Build dependencies for PIL/Pillow (Ubuntu:
-  ``apt-get build-dep python-imaging``)
+Python requirements are all in the ``Pipfile`` file. You can easily install
+these using pipenv, to get pipenv, if you already have Python and pip, run
+python ``pip install pipenv``.
 
 
 Testing
@@ -38,21 +29,36 @@ recommend using our tags/versions though.
 
 To run Pinry's tests inside the Pinry repo run::
 
-    virtualenv .venv
-    source .venv/bin/activate
-    pip install -r requirements.txt
-    python manage.py test
+    pipenv install --dev --three
+    pipenv run python manage.py test
 
 
-Production Deployment
----------------------
+Docker
+------
 
-Our supported and suggested way to deploy Pinry is using Docker. We
-provide support and instructions for that over at the `docker-pinry
-GitHub repository`_.
+Follow the steps below to install Pinry locally or on any server. This
+process installs the minimal requirements to run Pinry. For development
+requirements and procedures, see testing above.
 
-If you'd like a different setup then check out the hundreds of tutorials
-for production Django deployment found via Google.
+- Install the requirements:
+    - Docker
+    - Docker Compose
+
+- Set any custom configuration options you need and run::
+
+    docker-compose up -d
+
+- Bootstrap the database::
+
+    docker-compose exec web python3 manage.py migrate --settings=pinry.settings.docker
+
+
+Linting
+-------
+
+So everything isn't a mess::
+
+    pipenv run flake8 --exclude=migrations
 
 
 Contributors

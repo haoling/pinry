@@ -3,16 +3,7 @@ import os
 from django.contrib.messages import constants as messages
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'REPLACE-ME'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-# SECURITY WARNING: use your actual domain name in production!
-ALLOWED_HOSTS = ['*']
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Application definition
 
@@ -26,8 +17,8 @@ INSTALLED_APPS = [
     'taggit',
     'compressor',
     'django_images',
-    'pinry.core',
-    'pinry.users',
+    'core',
+    'users',
 ]
 
 ROOT_URLCONF = 'pinry.urls'
@@ -39,7 +30,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'pinry.users.middleware.Public',
+    'users.middleware.Public',
 ]
 
 TEMPLATES = [
@@ -53,7 +44,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'pinry.core.context_processors.template_settings',
+                'core.context_processors.template_settings',
             ],
         },
     },
@@ -72,16 +63,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
 
 WSGI_APPLICATION = 'pinry.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -128,7 +109,7 @@ ALLOW_NEW_REGISTRATIONS = True
 PUBLIC = True
 
 AUTHENTICATION_BACKENDS = [
-    'pinry.users.auth.backends.CombinedAuthBackend',
+    'users.auth.backends.CombinedAuthBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -145,7 +126,7 @@ MESSAGE_TAGS = {
 
 API_LIMIT_PER_PAGE = 50
 
-IMAGE_PATH = 'pinry.core.utils.upload_path'
+IMAGE_PATH = 'core.utils.upload_path'
 
 IMAGE_SIZES = {
     'thumbnail': {'size': [240, 0]},
