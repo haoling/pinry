@@ -1,10 +1,7 @@
 import requests
 import os
 
-try:
-    from cStringIO import StringIO
-except ImportError:  # Python 3 support
-    from io import StringIO
+from io import BytesIO
 
 from urlparse import urlparse
 from django.conf import settings
@@ -21,7 +18,7 @@ class ImageManager(models.Manager):
     # FIXME: Move this into an asynchronous task
     def create_for_url(self, url, referer):
         file_name = url.split("/")[-1].split('#')[0].split('?')[0]
-        buf = StringIO()
+        buf = BytesIO()
         if (referer):
             response = requests.get(url, headers={'referer': referer})
             if (response.status_code == 403):
