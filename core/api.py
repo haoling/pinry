@@ -142,7 +142,7 @@ class PinResource(ModelResource):
     def apply_filters(self, request, applicable_filters):
         filtered = super(PinResource, self).apply_filters(request, applicable_filters)
 
-        if applicable_filters.has_key('tags__name__in'):
+        if 'tags__name__in' in applicable_filters:
             if 'private' not in (tag.lower() for tag in applicable_filters['tags__name__in']):
                 filtered = filtered.filter(Q(submitter=request.user.pk) | ~Q(tags__name__iexact='private'))
         else:
