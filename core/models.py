@@ -3,7 +3,7 @@ import os
 
 from io import BytesIO
 
-from urllib.parse import urlparse
+from urlparse import urlparse
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db import models, transaction
