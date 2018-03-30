@@ -136,7 +136,7 @@ $(window).load(function() {
             }
             pinFromDomain = urlParser.hostname;
             if ($.cookie('pinform_domain_tag-' + pinFromDomain)) {
-                localStorage.setItem('pinform_domain_tag-' + pinFromDomain);
+                localStorage.setItem('pinform_domain_tag-' + pinFromDomain, $.cookie('pinform_domain_tag-' + pinFromDomain));
                 $.cookie('pinform_domain_tag-' + pinFromDomain, '', {expire:1, path:'/'});
             }
             $('#pin-form-tags').val(localStorage.getItem('pinform_domain_tag-' + pinFromDomain)).trigger('change');
