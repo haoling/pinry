@@ -277,7 +277,7 @@ $(window).load(function() {
         if ($('#pin-form-tags').val() != '') {
             $('#pin-form-tags').trigger('change');
         }
-        $(window).on('keyup', function(e){
+        $(window).on('keydown', function(e){
             if (e.keyCode == 13 && e.ctrlKey) {
                 $('#pin-form-submit').click();
             }
