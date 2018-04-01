@@ -19,3 +19,8 @@ DATABASES = {
         'NAME': '/data/production.db',
     }
 }
+
+MEDIA_URL = '/media/'
+STATIC_URL = '/static/'
+MEDIA_ROOT = '/data/media/'
+STATIC_ROOT = '/data/static/'
