@@ -181,11 +181,11 @@ textarea {
 
 
 /* Start Pins */
-#pins {
+#pins, #tagboards {
     top: 80px;
 }
 
-.pin {
+.pin, .tagboard {
     background: #fff;
     -webkit-border-radius: 3px;
        -moz-border-radius: 3px;
@@ -260,7 +260,25 @@ textarea {
     font-weight: normal;
 }
 
-.pin-footer {
+.tagboard {
+    display: block;
+    height: 280px;
+}
+
+.tagboard .image-wrapper {
+    display: none;
+    overflow-y: hidden;
+}
+
+.tagboard .image-wrapper.first {
+    height: 160px;
+}
+.tagboard .image-wrapper.second, .tagboard .image-wrapper.third, .tagboard .image-wrapper.fourth {
+    height: 80px;
+    float: left;
+}
+
+.pin-footer, .tag-footer {
     color: #777;
     cursor: default;
     font-size: 12px;
@@ -292,6 +310,12 @@ textarea {
     line-height: 16px;
     margin-top: -1px;
     width: 180px;
+}
+
+.tag-footer {
+    position: absolute;
+    top: 246px;
+    width: 100%;
 }
 
 .spinner {

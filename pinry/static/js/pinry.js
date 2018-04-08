@@ -14,10 +14,10 @@ $(window).load(function() {
      * changes.
      */
     window.tileLayout = function(autoScroll) {
-        var blockContainer = $('#pins');
+        var blockContainer = $('#pins, #tagboards');
         var isFreezed = blockContainer.css('position') == 'fixed';
         freezeScroll(false);
-        var blocks = blockContainer.children('.pin'),
+        var blocks = blockContainer.children('.pin, .tagboard'),
             blockMargin = 15,
             blockWidth = 240,
             rowSize = Math.floor(blockContainer.width()/(blockWidth+blockMargin)),
@@ -88,7 +88,13 @@ $(window).load(function() {
     window.scrollHandler = function() {
         var windowPosition = $(window).scrollTop() + $(window).height();
         var bottom = $(document).height() - 100;
-        if(windowPosition > bottom) loadPins();
+        if(windowPosition > bottom) {
+            if ($('#pins').length) {
+                loadPins();
+            } else if ($('#tagboards').length) {
+                loadTags();
+            }
+        }
     }
 
     /**
@@ -152,9 +158,82 @@ $(window).load(function() {
     }
 
 
+    /**
+     * Load tags
+     */
+    function loadTags() {
+        // Disable scroll
+        $(window).off('scroll');
+
+        // Show our loading symbol
+        $('.spinner').css('display', 'block');
+
+        // Fetch our pins from the api using our current offset
+        var apiUrl = '/api/v1/tag/?format=json&order_by=-id&offset='+String(offset);
+        $.get(apiUrl, function(tags) {
+            var template = Handlebars.compile($('#tags-template').html());
+            var html = template({tags: tags.objects});
+
+            // Append the newly compiled data to our container
+            $('#tagboards').append(html);
+            tileLayout();
+
+            $('.tagboard:not(:has(.image-wrapper:visible))').each(function(){
+                var thisTag = $(this);
+                $('.spinner', this).show();
+                var apiUrl = '/api/v1/pin/?format=json&order_by=-id&offset=0&limit=4&tag='+encodeURIComponent($(this).data('name'));
+                $.get(apiUrl, function(pins){
+                    $('.spinner', thisTag).hide();
+                    $('.text .total-count', thisTag).text(pins.meta.total_count + ' Pins').show();
+                    if (pins.objects[0] != undefined) {
+                        $('.image-wrapper.first img', thisTag).attr('src', pins.objects[0].image.thumbnail.image);
+                        $('.image-wrapper.first', thisTag).fadeIn(300);
+                    }
+                    if (pins.objects[1] != undefined) {
+                        $('.image-wrapper.second img', thisTag).attr('src', pins.objects[1].image.thumbnail.image);
+                        $('.image-wrapper.second', thisTag).fadeIn(300);
+                    }
+                    if (pins.objects[2] != undefined) {
+                        $('.image-wrapper.third img', thisTag).attr('src', pins.objects[2].image.thumbnail.image);
+                        $('.image-wrapper.third', thisTag).fadeIn(300);
+                    }
+                    if (pins.objects[3] != undefined) {
+                        $('.image-wrapper.fourth img', thisTag).attr('src', pins.objects[3].image.thumbnail.image);
+                        $('.image-wrapper.fourth', thisTag).fadeIn(300);
+                    }
+                    thisTag.css('cursor', 'pointer');
+                    thisTag.on('click', function(){
+                        location.href='/pins/tag/'+encodeURIComponent($(thisTag).data('name'))+'/';
+                    });
+                });
+            });
+
+            if (tags.objects.length < apiLimitPerPage) {
+                $('body > .spinner').css('display', 'none');
+                if ($('#tagboards').length !== 0) {
+                    var theEnd = document.createElement('div');
+                    theEnd.id = 'the-end';
+                    $(theEnd).html('&mdash; End &mdash;');
+                    $(theEnd).css('padding', 50);
+                    $('body').append(theEnd);
+                }
+            } else {
+                $(window).scroll(scrollHandler);
+            }
+        });
+
+        // Up our offset, it's currently defined as 50 in our settings
+        offset += apiLimitPerPage;
+    }
+
+
     // Set offset for loadPins and do our initial load
     var offset = 0;
-    loadPins();
+    if ($('#pins').length) {
+        loadPins();
+    } else if ($('#tagboards').length) {
+        loadTags();
+    }
 
     // If our window gets resized keep the tiles looking clean and in our window
     $(window).resize(function() {

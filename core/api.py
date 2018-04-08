@@ -9,6 +9,7 @@ from django_images.models import Thumbnail
 from django.db.models import Q
 from .models import Pin, Image
 from users.models import User
+from taggit.models import Tag
 
 
 class PinryAuthorization(DjangoAuthorization):
@@ -95,6 +96,15 @@ class ImageResource(ModelResource):
         resource_name = 'image'
         queryset = Image.objects.all()
         authorization = DjangoAuthorization()
+
+
+class TagResource(ModelResource):
+    class Meta:
+        ordering = ['id']
+        queryset = Tag.objects.all().distinct()
+        include_resource_uri = False
+
+
 
 
 class PinResource(ModelResource):

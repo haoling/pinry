@@ -1,0 +1,30 @@
+{% verbatim %}
+    <script id="tags-template" type="text/x-handlebars-template">
+        {{#each tags}}
+        <div class="tagboard" data-name="{{name}}">
+            <div class="spinner"></div>
+            <div class="image-wrapper first">
+                <img src="" width="240">
+            </div>
+            <div class="image-wrapper second">
+                <img src="" width="80">
+            </div>
+            <div class="image-wrapper third">
+                <img src="" width="80">
+            </div>
+            <div class="image-wrapper fourth">
+                <img src="" width="80">
+            </div>
+            <div class="tag-footer clearfix">
+                <div class="text">
+                    <div class="name pull-left">
+                    {{name}}
+                    </div>
+                    <div class="total-count pull-right">
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </script>
+{% endverbatim %}

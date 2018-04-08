@@ -63,6 +63,7 @@
                         {% if user.is_authenticated %}
                             <li><a onclick="pinForm()">New Pin</a></li>
                             <li><a href="{% url 'users:logout' %}">Logout</a></li>
+                            <li><a href="/tags">Tags</a></li>
                             <li>{% include "includes/bookmarklet_link.html" %}</li>
                         {% else %}
                             <li><a href="{% url 'users:login' %}">Login</a></li>
@@ -98,6 +99,7 @@
         {% include "includes/messages.html" %}
         {% include "includes/lightbox.html" %}
         {% include "includes/pins.html" %}
+        {% include "includes/tags.html" %}
         {% include "includes/pin_form.html" %}
         {% block extra_templates %}{% endblock %}
         <!-- End Templates -->
