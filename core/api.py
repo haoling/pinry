@@ -135,7 +135,7 @@ class PinResource(ModelResource):
         return bundle
 
     def dehydrate_tags(self, bundle):
-        return map(str, bundle.obj.tags.all())
+        return list(map(str, bundle.obj.tags.all()))
 
     def build_filters(self, filters=None):
         if 'domain' in filters:
