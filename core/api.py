@@ -6,7 +6,7 @@ from tastypie.exceptions import Unauthorized
 from tastypie.resources import ModelResource
 from django_images.models import Thumbnail
 
-from django.db.models import Q
+from django.db.models import Q, Count
 from .models import Pin, Image
 from users.models import User
 from taggit.models import Tag
@@ -157,6 +157,7 @@ class PinResource(ModelResource):
                 filtered = filtered.filter(Q(submitter=request.user.pk) | ~Q(tags__name__iexact='private'))
         else:
             filtered = filtered.exclude(tags__name__iexact='private')
+            filtered = filtered.annotate(tag_count=Count('tags')).filter(~Q(tags__name__startswith='_') | Q(tag_count=0) | Q(tag_count__gte=2))
 
         if request.GET.get('search', None):
             filtered = filtered.filter(self.search_filter(request.GET.get('search')))
