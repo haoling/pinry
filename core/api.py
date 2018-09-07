@@ -115,7 +115,7 @@ class PinResource(ModelResource):
 
     def hydrate_image(self, bundle):
         url = bundle.data.get('url', None)
-        if url:
+        if url and not bundle.data.get('image', None):
             image = Image.objects.create_for_url(url, bundle.data.get('referer', None))
             bundle.data['image'] = '/api/v1/image/{}/'.format(image.pk)
         return bundle
