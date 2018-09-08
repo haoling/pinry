@@ -151,16 +151,16 @@ class PinResource(ModelResource):
 
     def apply_filters(self, request, applicable_filters):
         filtered = super(PinResource, self).apply_filters(request, applicable_filters)
+        empty_filter = True
 
         if 'tags__name__in' in applicable_filters:
             if 'private' not in (tag.lower() for tag in applicable_filters['tags__name__in']):
                 filtered = filtered.filter(Q(submitter=request.user.pk) | ~Q(tags__name__iexact='private'))
-        else:
-            filtered = filtered.exclude(tags__name__iexact='private')
-            filtered = filtered.annotate(tag_count=Count('tags')).filter(~Q(tags__name__startswith='_') | Q(tag_count=0) | Q(tag_count__gte=2))
+                empty_filter = False
 
         if request.GET.get('search', None):
             filtered = filtered.filter(self.search_filter(request.GET.get('search')))
+            empty_filter = False
 
         if request.GET.get('domain', None):
             domain = request.GET.get('domain', None)
@@ -168,6 +168,11 @@ class PinResource(ModelResource):
                 Q(url__startswith='http://'+domain+'/')
                 | Q(url__startswith='https://'+domain+'/')
             )
+            empty_filter = False
+
+        if empty_filter:
+            filtered = filtered.exclude(tags__name__iexact='private')
+            filtered = filtered.annotate(tag_count=Count('tags')).exclude(tags__name__startswith='_')
 
         return filtered
 
