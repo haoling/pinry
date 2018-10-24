@@ -92,7 +92,9 @@
             border: '1px solid #555'
         });
         image.onclick = function() {
-            var popUrl = getFormUrl()+encodeURIComponent(imageUrl);
+            var popUrl = getFormUrl() + encodeURIComponent(imageUrl);
+            popUrl = popUrl + '&referer=' + encodeURIComponent(window.location);
+            popUrl = popUrl + '&description=' + encodeURIComponent(document.title);
             window.open(popUrl);
             closePinry();
         };

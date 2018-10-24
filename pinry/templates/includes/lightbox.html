@@ -3,7 +3,7 @@
         <div class="lightbox-background">
             <div class="lightbox-wrapper">
                 <div class="lightbox-image-wrapper">
-                    <img class="lightbox-image" src="{{image.standard.image}}" />
+                    <img class="lightbox-image" src="{{image.image}}" />
                 </div>
                 <div class="lightbox-data clearfix">
                 {{#if description}}
@@ -24,8 +24,9 @@
                         {{/if}}
                     </div>
                     <div class="text extra pull-right">
-                        <a href="{{url}}" class="btn btn-sm btn-default btn-warning">Original URL</a>
-                        <a href="/{{id}}/" class="btn btn-sm btn-default btn-success">Pin URL</a>
+                        <a href="{{referer}}" class="btn btn-sm btn-default btn-warning" target="_blank">Referer</a>
+                        <a href="{{url}}" class="btn btn-sm btn-default btn-primary" target="_blank">Original URL</a>
+                        <a href="/{{id}}/" class="btn btn-sm btn-default btn-success" target="_blank">Pin URL</a>
                     </div>
                 </div>
             </div>
