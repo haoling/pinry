@@ -18,6 +18,7 @@ $(window).load(function() {
         return {
             submitter: currentUser,
             url: $('#pin-form-image-url').val(),
+            referer: $('#pin-form-referer').val(),
             description: $('#pin-form-description').val(),
             tags: cleanTags($('#pin-form-tags').val())
         }
@@ -27,6 +28,7 @@ $(window).load(function() {
         var context = {pins: [{
                 submitter: currentUser,
                 image: {thumbnail: {image: $('#pin-form-image-url').val()}},
+                referer: $('#pin-form-referer').val(),
                 description: $('#pin-form-description').val(),
                 tags: cleanTags($('#pin-form-tags').val())
             }]},
@@ -66,10 +68,17 @@ $(window).load(function() {
             recentTags: cleanTags(localStorage.getItem('pinform_recent_tag') || "")
         }));
         var modal = $('#pin-form'),
-            formFields = [$('#pin-form-image-url'), $('#pin-form-description'),
+            formFields = [
+              $('#pin-form-image-url'),
+              $('#pin-form-referer'),
+              $('#pin-form-description'),
+              $('#pin-form-tags')
+            ],
             $('#pin-form-tags')],
             pinFromUrl = getUrlParameter('pin-image-url'),
             pinFromDomain = undefined;
+            pinFromDescription = getUrlParameter('pin-description'),
+            pinFromReferer = getUrlParameter('referer');
         // If editable grab existing data
         if (editPinId) {
             var promise = getPinData(editPinId);
@@ -77,6 +86,7 @@ $(window).load(function() {
                 editedPin = data;
                 $('#pin-form-image-url').val(editedPin.image.thumbnail.image);
                 $('#pin-form-image-url').parent().hide();
+                $('#pin-form-referer').parent().hide();
                 $('#pin-form-image-upload').parent().hide();
                 $('#pin-form-description').val(editedPin.description);
                 $('#pin-form-tags').val(editedPin.tags).trigger('change');
@@ -127,6 +137,8 @@ $(window).load(function() {
         if (pinFromUrl) {
             $('#pin-form-image-upload').parent().css('display', 'none');
             $('#pin-form-image-url').val(pinFromUrl);
+            $('#pin-form-referer').val(pinFromReferer);
+            $('#pin-form-description').val(pinFromDescription);
             $('.navbar').css('display', 'none');
             var urlParser = document.createElement('a');
             if (getUrlParameter('referer') != '') {
@@ -197,6 +209,7 @@ $(window).load(function() {
             } else {
                 var data = {
                     submitter: '/api/v1/user/'+currentUser.id+'/',
+                    referer: $('#pin-form-referer').val(),
                     description: $('#pin-form-description').val(),
                     tags: cleanTags($('#pin-form-tags').val().replace(',', ' ').trim())
                 };
