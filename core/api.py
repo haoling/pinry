@@ -246,7 +246,7 @@ class PinResource(ModelResource):
             )
             empty_filter = False
 
-        if empty_filter:
+        if empty_filter and not 'pk' in applicable_filters:
             filtered = filtered.exclude(tags__name__iexact='private')
             filtered = filtered.annotate(tag_count=Count('tags')).exclude(tags__name__startswith='_')
 
