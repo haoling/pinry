@@ -74,7 +74,6 @@ $(window).load(function() {
               $('#pin-form-description'),
               $('#pin-form-tags')
             ],
-            $('#pin-form-tags')],
             pinFromUrl = getUrlParameter('pin-image-url'),
             pinFromDomain = undefined;
             pinFromDescription = getUrlParameter('pin-description'),
