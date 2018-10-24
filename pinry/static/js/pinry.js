@@ -229,7 +229,17 @@ $(window).load(function() {
 
     // Set offset for loadPins and do our initial load
     var offset = 0;
-    if ($('#pins').length) {
+    if (location.pathname.match(/^\/pin\/([0-9]+)(?:\/.*)?$/)) {
+        var apiUrl = '/api/v1/pin/' + RegExp.$1 + '/?format=json';
+        $.get(apiUrl, function(pin) {
+            var template = Handlebars.compile($('#pins-template').html());
+            var html = template({pins: [pin]});
+            $('#pins').append(html);
+
+            tileLayout();
+            lightbox();
+        });
+    } else if ($('#pins').length) {
         loadPins();
     } else if ($('#tagboards').length) {
         loadTags();
