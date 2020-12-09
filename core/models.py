@@ -23,12 +23,14 @@ class ImageManager(models.Manager):
     }
 
     # FIXME: Move this into an asynchronous task
-    def create_for_url(self, url, referer=None):
+    def create_for_url(self, url, referer=None, cookie=None):
         file_name = url.split("/")[-1].split('#')[0].split('?')[0]
         buf = BytesIO()
         headers = dict(self._default_ua)
         if referer is not None:
             headers["Referer"] = referer
+            if cookie is not None:
+                headers["Cookie"] = cookie
             response = requests.get(url, headers=headers)
             if (response.status_code != 200):
                 print('status_code: {}, retry without referer'.format(response.status_code))

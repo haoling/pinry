@@ -19,6 +19,7 @@ $(window).load(function() {
             submitter: currentUser,
             url: $('#pin-form-image-url').val(),
             referer: $('#pin-form-referer').val(),
+            cookie: $('#pin-form-cookie').val(),
             description: $('#pin-form-description').val(),
             tags: cleanTags($('#pin-form-tags').val())
         }
@@ -29,6 +30,7 @@ $(window).load(function() {
                 submitter: currentUser,
                 image: {thumbnail: {image: $('#pin-form-image-url').val()}},
                 referer: $('#pin-form-referer').val(),
+                cookie: $('#pin-form-cookie').val(),
                 description: $('#pin-form-description').val(),
                 tags: cleanTags($('#pin-form-tags').val())
             }]},
@@ -71,6 +73,7 @@ $(window).load(function() {
             formFields = [
               $('#pin-form-image-url'),
               $('#pin-form-referer'),
+              $('#pin-form-cookie'),
               $('#pin-form-description'),
               $('#pin-form-tags')
             ],
@@ -78,6 +81,7 @@ $(window).load(function() {
             pinFromDomain = undefined;
             pinFromDescription = getUrlParameter('pin-description'),
             pinFromReferer = getUrlParameter('referer');
+            pinFromCookie = getUrlParameter('cookie');
         // If editable grab existing data
         if (editPinId) {
             var promise = getPinData(editPinId);
@@ -86,6 +90,7 @@ $(window).load(function() {
                 $('#pin-form-image-url').val(editedPin.image.thumbnail.image);
                 $('#pin-form-image-url').parent().hide();
                 $('#pin-form-referer').parent().hide();
+                $('#pin-form-cookie').parent().hide();
                 $('#pin-form-image-upload').parent().hide();
                 $('#pin-form-description').val(editedPin.description);
                 $('#pin-form-tags').val(editedPin.tags).trigger('change');
@@ -137,6 +142,7 @@ $(window).load(function() {
             $('#pin-form-image-upload').parent().css('display', 'none');
             $('#pin-form-image-url').val(pinFromUrl);
             $('#pin-form-referer').val(pinFromReferer);
+            $('#pin-form-cookie').val(pinFromCookie);
             $('#pin-form-description').val(pinFromDescription);
             $('.navbar').css('display', 'none');
             var urlParser = document.createElement('a');
@@ -209,6 +215,7 @@ $(window).load(function() {
                 var data = {
                     submitter: '/api/v1/user/'+currentUser.id+'/',
                     referer: $('#pin-form-referer').val(),
+                    cookie: $('#pin-form-cookie').val(),
                     description: $('#pin-form-description').val(),
                     tags: cleanTags($('#pin-form-tags').val().replace(',', ' ').trim())
                 };
@@ -217,6 +224,7 @@ $(window).load(function() {
                 } else {
                     data.url = $('#pin-form-image-url').val();
                     data.referer = getUrlParameter('referer');
+                    data.cookie = getUrlParameter('cookie');
                 }
                 var promise = postPinData(data);
                 promise.success(function(pin) {

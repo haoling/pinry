@@ -193,6 +193,7 @@ class PinResource(ModelResource):
             image = Image.objects.create_for_url(
                 url,
                 referer=bundle.data.get('referer', None),
+                cookie=bundle.data.get('cookie', None),
             )
             bundle.data['image'] = '/api/v1/image/{}/'.format(image.pk)
         return bundle
