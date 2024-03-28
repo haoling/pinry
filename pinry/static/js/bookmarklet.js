@@ -2,11 +2,10 @@
  * Bookmarklet for Pinry
  * Descrip: This is trying to be as standalone a script as possible hence
  *          why it has built in helpers and such when the rest of the
- *          scripts make use of helpers.js. In the future i want to remove
- *          all dependencies on jQuery.
+ *          scripts make use of helpers.js.
  * Authors: Pinry Contributors
- * Updated: Mar 4th, 2013
- * Require: None (dynamically loads jQuery if needed)
+ * Updated: Apr 23th, 2022
+ * Require: None
  */
 
 (function main() {
@@ -23,7 +22,7 @@
     function getFormUrl() {
         var src = document.getElementById('pinry-bookmarklet').src;
         src = src.substr(0, src.indexOf('/static/js'));
-        return src + '/pins/pin-form/?pin-image-url=';
+        return src + '/pin-creation/from-url?url=';
     }
 
     function setCSS(el, css) {
@@ -39,7 +38,8 @@
         pinryImages.id = 'pinry-images';
         setCSS(pinryImages, {
             position: 'fixed',
-            zIndex: 9001,
+            display: 'block',
+            zIndex: 2147483647,
             background: 'rgba(0, 0, 0, 0.7)',
             paddingTop: '70px',
             top: 0,
@@ -53,6 +53,7 @@
         var pinryBar = document.createElement('div');
         pinryBar.id = 'pinry-bar';
         setCSS(pinryBar, {
+            display: 'block',
             background: 'black',
             padding: '15px',
             position: 'absolute',
@@ -67,10 +68,30 @@
         pinryBar.textContent = 'Pinry Bookmarklet';
         pinryBar.onclick = closePinry;
         pinryImages.appendChild(pinryBar);
+        var pinrySort = document.createElement('div');
+        setCSS(pinrySort, {
+            display: 'block',
+            position: 'absolute',
+            top: '15px',
+            right: '1em',
+            cursor: 'pointer'
+        });
+        pinrySort.textContent = '\u21D5 Size';
+        pinryBar.appendChild(pinrySort);
         document.body.appendChild(pinryImages);
         document.onkeyup = function (e) {
             if (e.keyCode == 27) // ESC key
                 closePinry();
+        };
+        pinrySort.onclick = function (e) {
+            e.stopPropagation();
+            Array.prototype.slice.call(pinryImages.children
+            ).sort(function (a, b) {
+                return b.getAttribute('pinryArea') - a.getAttribute('pinryArea');
+            }).forEach(function (div) {
+                // re-add to parent in sorted order
+                pinryImages.appendChild(div);
+            });
         };
     }
 
@@ -105,16 +126,40 @@
 
 
     // Start Active Functions
-    function addAllImagesToPageView() {
-        var images = document.getElementsByTagName('img');
-        for (var i = 0; i < images.length; ++i) {
-            var t = images[i],
-                w = t.naturalWidth,
-                h = t.naturalHeight;
-            if (w > 200 && h > 200)
-                imageView(t.src).textContent = w + '\u00D7' + h;
+    var images = {}, // cache URLs to avoid duplicates
+        reURL = /url[(]"([^"]+)"[)]/; // match an URL in CSS
+    function addImage(img) {
+        if (images[img.src])
+            return;
+        images[img.src] = true;
+        var w = img.naturalWidth,
+            h = img.naturalHeight;
+            if (w > 200 && h > 200) {
+                var i = imageView(img.src);
+                i.textContent = w + '\u00D7' + h;
+                i.setAttribute('pinryArea', w * h);
+            }
         }
-        return images;
+    function addAllImagesToPageView() {
+        // add all explicit IMGs
+        var images = document.getElementsByTagName('img');
+        for (var i = 0; i < images.length; ++i)
+            addImage(images[i]);
+        // add all background images
+        ['body', 'div', 'td'].forEach(function (tagName) {
+             var tags = document.getElementsByTagName(tagName);
+             for (var i = 0; i < tags.length; ++i) {
+                 var m = reURL.exec(tags[i].style.backgroundImage);
+                 if (m) {
+                     // load image to know size
+                     var img = new Image();
+                     img.onload = function () {
+                         addImage(this);
+                     };
+                     img.src = m[1];
+                 }
+             }
+        });
     }
     // End Active Functions
 

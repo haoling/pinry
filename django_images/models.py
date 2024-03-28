@@ -1,17 +1,13 @@
 import hashlib
 import os.path
-from io import BytesIO
 
 from django.db import models
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.core.urlresolvers import reverse
 from django.dispatch import receiver
-import PIL
 
-try:
-    from importlib import import_module
-except ImportError:
-    from django.utils.importlib import import_module
+from importlib import import_module
+
+from django.urls import reverse
 
 from . import utils
 from .settings import IMAGE_SIZES, IMAGE_PATH, IMAGE_AUTO_DELETE
@@ -67,42 +63,41 @@ class Image(models.Model):
 
 
 class ThumbnailManager(models.Manager):
-    def get_or_create_at_size(self, image_id, size):
-        image = Image.objects.get(id=image_id)
-        if size not in IMAGE_SIZES:
-            raise ValueError("Received unknown size: %s" % size)
-        try:
-            thumbnail = image.get_by_size(size)
-        except Thumbnail.DoesNotExist:
-            img = utils.scale_and_crop(image.image, **IMAGE_SIZES[size])
-            # save to memory
-            buf = BytesIO()
+    def get_or_create_at_sizes(self, image, sizes):
+        sizes_to_create = list(sizes)
+        sized = {}
+        for size in sizes:
+            if size not in IMAGE_SIZES:
+                raise ValueError("Received unknown size: %s" % size)
+
             try:
-                img.save(buf, img.format, **img.info)
-            except IOError:
-                if img.info.get('progression'):
-                    orig_MAXBLOCK = PIL.ImageFile.MAXBLOCK
-                    temp_MAXBLOCK = 1048576
-                    if orig_MAXBLOCK >= temp_MAXBLOCK:
-                        raise
-                    PIL.ImageFile.MAXBLOCK = temp_MAXBLOCK
-                    try:
-                        img.save(buf, img.format, **img.info)
-                    finally:
-                        PIL.ImageFile.MAXBLOCK = orig_MAXBLOCK
-                else:
-                    raise
-            # and save to storage
-            original_dir, original_file = os.path.split(image.image.name)
-            thumb_file = InMemoryUploadedFile(buf, "image", original_file,
-                                              None, buf.tell(), None)
-            thumbnail, created = image.thumbnail_set.get_or_create(
-                size=size, defaults={'image': thumb_file})
-        return thumbnail
+                sized[size] = image.get_by_size(size)
+            except Thumbnail.DoesNotExist:
+                pass
+            else:
+                sizes_to_create.remove(size)
+
+        if sizes_to_create:
+            bufs = [
+                utils.write_image_in_memory(img)
+                for img in utils.scale_and_crop_iter(
+                    image.image,
+                    [IMAGE_SIZES[size] for size in sizes_to_create])
+            ]
+            for size, buf in zip(sizes_to_create, bufs):
+                # and save to storage
+                original_dir, original_file = os.path.split(image.image.name)
+                thumb_file = InMemoryUploadedFile(buf, "image", original_file,
+                                                  None, buf.tell(), None)
+                sized[size], created = image.thumbnail_set.get_or_create(
+                    size=size, defaults={'image': thumb_file})
+
+        # Make sure this is in the correct order
+        return [sized[size] for size in sizes]
 
 
 class Thumbnail(models.Model):
-    original = models.ForeignKey(Image)
+    original = models.ForeignKey(Image, on_delete=models.CASCADE)
     image = models.ImageField(upload_to=upload_to,
                               height_field='height', width_field='width',
                               max_length=255)

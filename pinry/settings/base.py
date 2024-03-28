@@ -14,22 +14,29 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'django_filters',
     'taggit',
     'compressor',
     'django_images',
     'core',
     'users',
+    'pinry_plugins.apps.PinryPluginsConfig',
 ]
 
 ROOT_URLCONF = 'pinry.urls'
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
+
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'pinry.middleware.ForceCSRFCookieMiddleware',
     'users.middleware.Public',
 ]
 
@@ -100,7 +107,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-MEDIA_URL = '/static/media/'
+MEDIA_URL = '/media/'
 
 # Set to False to disable people from creating new accounts.
 ALLOW_NEW_REGISTRATIONS = True
@@ -139,3 +146,27 @@ IS_TEST = False
 
 # User custom settings
 IMAGE_AUTO_DELETE = True
+
+# Rest Framework
+
+DRF_URL_FIELD_NAME = "resource_link"
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly'
+    ],
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+    'URL_FIELD_NAME': DRF_URL_FIELD_NAME,
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': API_LIMIT_PER_PAGE,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}

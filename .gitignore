@@ -1,3 +1,7 @@
+# I have no idea
+*.iml
+
+
 # local_settings
 local_settings.py
 
@@ -39,3 +43,12 @@ docker-compose.yml
 /.idea/
 *.pyc
 *.swp
+
+# mkdocs
+/docs/dist/
+
+# vscode
+/.vscode
+
+# docker image data
+docker/data/*
