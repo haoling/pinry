@@ -29,7 +29,7 @@ DATABASES = {
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 MEDIA_ROOT = '/data/media/'
-STATIC_ROOT = '/data/static/'
+STATIC_ROOT = '/srv/www/pinry/app/pinry/static/'
 
 try:
     from .local_settings import *
