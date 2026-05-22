@@ -78,6 +78,7 @@ $(window).load(function() {
               $('#pin-form-tags')
             ],
             pinFromUrl = getUrlParameter('pin-image-url'),
+            pinFromId = getUrlParameter('pin-image-id'),
             pinFromDomain = undefined;
             pinFromDescription = getUrlParameter('pin-description'),
             pinFromReferer = getUrlParameter('referer');
@@ -138,9 +139,21 @@ $(window).load(function() {
             }
         });
         // If bookmarklet submit
-        if (pinFromUrl) {
+        if (pinFromUrl || pinFromId) {
             $('#pin-form-image-upload').parent().css('display', 'none');
-            $('#pin-form-image-url').val(pinFromUrl);
+            if (pinFromUrl) {
+                $('#pin-form-image-url').val(pinFromUrl);
+            } else if (pinFromId) {
+                var promise = getImageData(pinFromId);
+                uploadedImage = pinFromId;
+                promise.success(function(image) {
+                    $('#pin-form-image-url').val(image.thumbnail.image);
+                    createPinPreviewFromForm();
+                });
+                promise.error(function() {
+                    message('Problem retrieving image.', 'alert alert-danger', -1);
+                });
+            }
             $('#pin-form-referer').val(pinFromReferer);
             $('#pin-form-cookie').val(pinFromCookie);
             $('#pin-form-description').val(pinFromDescription);
@@ -242,6 +255,9 @@ $(window).load(function() {
                         localStorage.setItem('pinform_recent_tag', recentTags);
                         return window.close();
                     }
+                    if (pinFromId) {
+                        return window.close();
+                    }
                     pin.editable = true;
                     pin = renderTemplate('#pins-template', {pins: [pin]});
                     $('#pins').prepend(pin);
@@ -256,7 +272,7 @@ $(window).load(function() {
             }
         });
         $('#pin-form-close').click(function() {
-            if (pinFromUrl) return window.close();
+            if (pinFromUrl || pinFromId) return window.close();
             tileLayout();
             dismissModal(modal);
         });
@@ -313,7 +329,7 @@ $(window).load(function() {
         createPinForm(editPinId);
     }
 
-    if (getUrlParameter('pin-image-url')) {
+    if (getUrlParameter('pin-image-url') || getUrlParameter('pin-image-id')) {
         createPinForm();
     }
     // End Init
